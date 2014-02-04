@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<project name="RAMF" default="jar" basedir=".">
+
+	<target name="jar" description="ramf-0.1.jar" depends="createStructure">
+		<buildnumber />
+		<jar destfile="${dir.build}/ramf-1.${build.number}.jar">
+			<zipfileset dir="./bin" includes="**/*.class" />
+		</jar>
+	</target>
+
+	<target name="createStructure">
+		<property name="dir.build" value="./build" />
+		<mkdir dir="${dir.build}" />
+	</target>
+	
+	<target name="buildTest">
+		<mkdir dir="c:/ramf" />
+		<mkdir dir="c:/ramf/web" />
+		<mkdir dir="c:/ramf/web/WEB-INF" />
+		<mkdir dir="c:/ramf/web/WEB-INF/classes" />
+		<mkdir dir="c:/ramf/web/WEB-INF/lib" />
+		<copy todir="c:/ramf/web">
+			<fileset dir=".">
+				<include name="WEB-INF/**/*.*" />
+				<include name="index.html" />
+			</fileset>
+		</copy>
+		<copy todir="c:/ramf/web/WEB-INF/classes">
+			<fileset dir="bin">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+</project>
+

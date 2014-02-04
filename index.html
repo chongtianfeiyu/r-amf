@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="AMFR.js"></script>
+		<script type="text/javascript">
+			function showAlert() {
+
+				var con = new AMFR();
+				con.endpoint = "http://localhost:8080/ramf/amfr";
+				var msg = con.createMessage("testService", "doTest",[{
+					AMFR_class:"com.reignite.test.TestBean",
+					aLongObj:34534534
+				}]);
+				con.call(msg, function(data){console.log(data)},function(data){console.log(data)});
+			}
+			var con = new AMFR();
+		</script>
+	</head>
+	<body>
+		<button onclick="showAlert();">Run Test</button>
+	</body>
+</html>

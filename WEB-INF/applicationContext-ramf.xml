@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<bean id="ramfServer" class="com.reignite.messaging.server.RAMFServer">
+		<property name="endpointLocator" ref="endpointLocator" />
+		<property name="codecLocator" ref="codecLocator" />
+		<property name="errorVersion" value="99" />
+	</bean>
+
+	<bean id="endpointLocator" class="com.reignite.messaging.server.WebEndpointLocator">
+		<property name="endpointMap">
+			<util:map>
+				<entry key="/amfr" value-ref="endpoint" />
+			</util:map>
+		</property>
+	</bean>
+
+	<bean id="codecLocator" class="com.reignite.codec.CodecLocatorImpl">
+		<property name="serializeWorkers">
+			<util:map>
+				<entry key="99" value="com.reignite.codec.amf.AMFRSerializeWorker" />
+			</util:map>
+		</property>
+		<property name="deserializeWorkers">
+			<util:map>
+				<entry key="99" value="com.reignite.codec.amf.AMFRDeserializeWorker" />
+			</util:map>
+		</property>
+		<property name="aliasRegistry">
+			<bean class="com.reignite.messaging.MessagingAliasRegistry">
+			</bean>
+		</property>
+		<property name="proxyRegistry">
+			<bean class="com.reignite.messaging.MessagingProxyRegistry">
+				<property name="typeEditor" ref="delegatingTypeEditor" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="delegatingTypeEditor" class="com.reignite.messaging.proxy.DelegatingTypeEditor" />
+
+	<bean id="endpoint" class="com.reignite.messaging.server.AMFEndpoint">
+		<constructor-arg ref="ramfServer" />
+		<property name="destinationMap">
+			<util:map>
+				<entry key="testService" value-ref="testServiceDestination" />
+				<entry key="dynamicQueryService" value-ref="dynamicQueryServiceDestination" />
+			</util:map>
+		</property>
+	</bean>
+	
+	<bean id="testServiceDestination" class="com.reignite.messaging.server.SpringInitializedDestination">
+		<property name="name" value="testService" />
+		<property name="target" ref="testService" />
+		<property name="typeEditor" ref="delegatingTypeEditor" />
+	</bean>
+	<bean id="dynamicQueryServiceDestination" class="com.reignite.messaging.server.SpringInitializedDestination">
+		<property name="name" value="dynamicQueryService" />
+		<property name="target" ref="testService" />
+		<property name="typeEditor" ref="delegatingTypeEditor" />
+	</bean>
+	<bean id="testService" class="com.reignite.test.TestService"/>
+</beans>
